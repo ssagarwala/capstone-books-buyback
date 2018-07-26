@@ -8,13 +8,14 @@
 
 <p th:unless="${books} and ${books.size()}"> No Books :(</p>
 
-<table class="table">
-<tr th:each="book : ${books}">
-    <td th:text="${book.name}">Key</td>
-    <td th:text="${book.author}">Value</td>
-    <td><a th:href="@{'/book/edit/' + ${book.id}}">edit</a></td>
-</tr>
-</table>
+<form method="post">
+<div th:each="book : ${books}" class="checkbox">
+   <input type="checkbox" name="bookIds" th:value="${book.id}" th:id="${book.id}"/>
+    <label th:for="${book.id }" th:text="${book.name}" ></label>
+    <br />
+</div>
 
+    <input type="submit" value="Remove Book(s)" />
+</form>
 </body>
 </html>

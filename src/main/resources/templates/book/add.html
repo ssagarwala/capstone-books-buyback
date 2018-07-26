@@ -1,13 +1,24 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments :: head"> </head>
-<body>
+<body class="container">
 <h1 th:text="${title}"></h1>
 <nav th:replace="fragments :: navigation"></nav>
 
 
-<form method="post">
-    <input type="text" name="bookName" />
+<form method="post" style="max-width:600px;" th:object="${book}">
+        <div class="form-group">
+                <label th:for="name">Book Name</label>
+                <input class="form-control" th:field="*{name}"/>
+                <span th:errors="*{name}" class="error"></span>
+        </div>
+
+        <div class="form-group">
+                <label th:for="author">Author Name</label>
+                <input class="form-control" th:field="*{author}" />
+                <span th:errors="*{author}" class="error"></span>
+        </div>
+
     <input type="submit" value="Add Book" />
 </form>
 
