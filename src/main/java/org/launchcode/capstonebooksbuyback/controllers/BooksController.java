@@ -1,6 +1,8 @@
 package org.launchcode.capstonebooksbuyback.controllers;
 import org.launchcode.capstonebooksbuyback.models.Book;
+import org.launchcode.capstonebooksbuyback.models.User;
 import org.launchcode.capstonebooksbuyback.models.data.BookDao;
+import org.launchcode.capstonebooksbuyback.models.data.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,7 +10,10 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
+
+import static java.lang.Integer.parseInt;
 
 /**
  * Created by Sehar Sagarwala
@@ -21,6 +26,8 @@ public class BooksController {
      @Autowired
      private BookDao bookDao;
 
+     @Autowired
+     private UserDao userDao;
 
     //add RequestMapping to configure the route to this
     //@ResponseBody allows text to be sent directly from the
@@ -36,22 +43,33 @@ public class BooksController {
         return "book/index";
     }
 
-    @RequestMapping(value="add", method=RequestMethod.GET)
-    public String displayAddBookForm (Model model){
+    @RequestMapping(value="add/{userId}", method=RequestMethod.GET)
+    public String displayAddBookForm (@PathVariable int userId,Model model){
         model.addAttribute("title","Add Book");
-        model.addAttribute(new Book());
-        return "book/add";
+        Optional<User> user1 = userDao.findById(userId);
+        if(user1.isPresent()){
+            User user = user1.get();
+            model.addAttribute(new Book());
+            model.addAttribute("userId",user.getId());
+            return "book/add";
+        }
+        return "redirect:";
     }
 
     @RequestMapping(value="add", method=RequestMethod.POST)
-    public String processAddBookForm(@ModelAttribute @Valid Book book,Errors error,Model model){
+    public String processAddBookForm(@ModelAttribute @Valid Book book,Errors error,@RequestParam int userId, Model model){
 
         if(error.hasErrors()){
             model.addAttribute("title","Add Book");
             return "book/add";
         }
-
-        bookDao.save(book);
+        //Integer userId1= Integer.parseInt(userId);
+        Optional<User> user1 = userDao.findById(userId);
+        if(user1.isPresent()) {
+            User user = user1.get();
+            book.setUser(user);
+            bookDao.save(book);
+        }
        //leaving redirect empty, redirect to the same controller's index method.
         return "redirect:";
     }
@@ -101,5 +119,21 @@ public class BooksController {
         }
         return "book/index";
     }
+
+    ///find book by user
+    /**public String booksByUser(Model model, @RequestParam int id){
+
+        Optional<User> user1 = userDao.findById(id);
+        if(user1.isPresent()) {
+            User user = user1.get();
+            List<Book> books = user.;
+            model.addAttribute("books", books);
+            model.addAttribute("title", "books by user" + user.getUsername());
+        }
+        return "user/index";
+
+    }**/
+
+
 
 }

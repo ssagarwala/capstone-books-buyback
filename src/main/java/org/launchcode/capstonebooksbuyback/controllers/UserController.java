@@ -34,9 +34,12 @@ public class UserController {
         }
 
         if(verify.equals(user.getPassword())){
-            model.addAttribute("title","Welcome"+user.getUsername());
+            //model.addAttribute("title","Welcome"+user.getUsername());
             userDao.save(user);
-            return "user/index";
+
+            ////////changed *******
+            //model.addAttribute("userId",user.getId());
+            return "redirect:/book/add/" +user.getId();
         }
         else{
             model.addAttribute("username",user.getUsername());

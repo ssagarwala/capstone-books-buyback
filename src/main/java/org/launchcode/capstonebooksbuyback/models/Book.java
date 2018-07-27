@@ -3,6 +3,7 @@ package org.launchcode.capstonebooksbuyback.models;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -22,11 +23,24 @@ public class Book {
     public int getId() {
         return id;
     }
+
+    @ManyToOne
+    private User user;
+
+    public Book(){ }
+
     public Book(String name, String author) {
         this.name = name;
         this.author = author;
     }
-    public Book(){ }
+
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+    public User getUser() {
+        return user;
+    }
 
     public String getName() {
         return name;
