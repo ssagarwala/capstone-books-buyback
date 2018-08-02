@@ -4,8 +4,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Book {
@@ -24,8 +25,16 @@ public class Book {
         return id;
     }
 
+
+    @NotNull
+    @DecimalMax("150.0") @DecimalMin("0.0")
+    private double price;
+
     @ManyToOne
     private User user;
+
+
+   // private List<Book> books = new ArrayList<>();
 
     public Book(){ }
 
@@ -56,6 +65,14 @@ public class Book {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 }
 

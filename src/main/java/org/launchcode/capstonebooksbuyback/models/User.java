@@ -30,11 +30,16 @@ public class User {
     @Size(min=3,message="Password > 3 and verify passwords do not match")
     private String password;
 
+    @NotNull
+    private int zipcode;
+
     @OneToMany
     @JoinColumn(name="user_id")
     private List<Book> books = new ArrayList<>();
 
-
+    public List getBooks(){
+        return books;
+    }
 
     public User(String username, String email, String password){
         this.username=username;
@@ -66,5 +71,10 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getZipcode() { return zipcode; }
+
+    public void setZipcode(int zipcode) {this.zipcode = zipcode;
     }
 }

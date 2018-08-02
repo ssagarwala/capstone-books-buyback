@@ -9,8 +9,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 
 import static java.lang.Integer.parseInt;
@@ -34,56 +35,85 @@ public class BooksController {
     // controller method
     //RequestPAth: /book
     @RequestMapping("")
-    public String index(Model model) {
-
-        //tell thymeleaf we want to return a a template.
-
-        model.addAttribute("books", bookDao.findAll());
-        model.addAttribute("title", "My Books");
-        return "book/index";
+    public String index(Model model,HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("id");
+        Optional<User> user1 = userDao.findById(userId);
+        if (user1.isPresent()) {
+            User user = user1.get();
+            Iterable<User> books = user.getBooks();
+            model.addAttribute("books", books);
+            model.addAttribute("title", "My Books");
+            return "book/index";
+        }
+        model.addAttribute("title", "Please log in your account ");
+        return "user/login";
     }
+   /* @RequestMapping(value="add/{userId}", method=RequestMethod.GET
+   * public String displayAddBookForm (@PathVariable int userId,Model model){*/
+    @RequestMapping(value="add", method=RequestMethod.GET)
+    public String displayAddBookForm (Model model,HttpServletRequest request){
 
-    @RequestMapping(value="add/{userId}", method=RequestMethod.GET)
-    public String displayAddBookForm (@PathVariable int userId,Model model){
-        model.addAttribute("title","Add Book");
+        HttpSession session = request.getSession();
+
+        Integer userId = (Integer) session.getAttribute("id");
+        System.out.println("Found uer ***********");
         Optional<User> user1 = userDao.findById(userId);
         if(user1.isPresent()){
             User user = user1.get();
+           // int [] zipcodes = {"63017","63141","63005"};
             model.addAttribute(new Book());
             model.addAttribute("userId",user.getId());
+            model.addAttribute("title","Welcome"+ user.getUsername() + "\n You can now sell books");
+            System.out.println("Found uer 2 ***********");
             return "book/add";
         }
         return "redirect:";
     }
 
-    @RequestMapping(value="add", method=RequestMethod.POST)
-    public String processAddBookForm(@ModelAttribute @Valid Book book,Errors error,@RequestParam int userId, Model model){
+   /* public String processAddBookForm(@ModelAttribute @Valid Book book,Errors error,@RequestParam int userId, Model model){
+*/
 
+    @RequestMapping(value="add", method=RequestMethod.POST)
+    public String processAddBookForm(@ModelAttribute @Valid Book book, Errors error, HttpServletRequest request, Model model){
         if(error.hasErrors()){
             model.addAttribute("title","Add Book");
             return "book/add";
         }
         //Integer userId1= Integer.parseInt(userId);
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("id");
         Optional<User> user1 = userDao.findById(userId);
         if(user1.isPresent()) {
             User user = user1.get();
             book.setUser(user);
             bookDao.save(book);
+            System.out.println("user id is "+ user.getId());
+            return "redirect:";
         }
        //leaving redirect empty, redirect to the same controller's index method.
-        return "redirect:";
+        return "redirect:/user/login";
     }
 
     @RequestMapping(value="remove", method=RequestMethod.GET)
-    public String displayRemoveBookForm(Model model){
-        model.addAttribute("books",bookDao.findAll());
-        model.addAttribute("title","Remove Books");
-        return "book/remove";
+    public String displayRemoveBookForm(Model model, HttpServletRequest request){
+
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("id");
+        Optional<User> user1 = userDao.findById(userId);
+        if(user1.isPresent()) {
+            User user = user1.get();
+            Iterable<User> books = user.getBooks();
+            model.addAttribute("books",books);
+            model.addAttribute("title", "Remove Books");
+            return "book/remove";
+        }
+        return "redirect:/user/login";
     }
 
     @RequestMapping(value="remove", method=RequestMethod.POST)
     public String processRemoveBookForm(@RequestParam int[] bookIds){
-       
+
         for (int bookId : bookIds) {
              bookDao.deleteById(bookId);
         }

@@ -6,7 +6,10 @@
 <nav th:replace="fragments :: navigation"></nav>
 
 
-<form method="post" action="../add" style="max-width:600px;" th:object="${book}">
+<a href="../../user/logout">logout</a>
+
+
+<form method="post" action="add" style="max-width:600px;" th:object="${book}">
         <div class="form-group">
                 <label th:for="name">Book Name</label>
                 <input class="form-control" th:field="*{name}"/>
@@ -17,6 +20,11 @@
                 <label th:for="author">Author Name</label>
                 <input class="form-control" th:field="*{author}" />
                 <span th:errors="*{author}" class="error"></span>
+        </div>
+        <div class="form-group">
+                <label th:for="price">Price</label>
+                <input class="form-control" th:field="*{price}" />
+                <span th:errors="*{price}" class="error"></span>
         </div>
 
         <!--changed *******-->
