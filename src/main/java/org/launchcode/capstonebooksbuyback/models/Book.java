@@ -34,7 +34,11 @@ public class Book {
     private User user;
 
 
-   // private List<Book> books = new ArrayList<>();
+    @ManyToOne
+    private Zip zip;
+
+
+    // private List<Book> books = new ArrayList<>();
 
     public Book(){ }
 
@@ -73,6 +77,11 @@ public class Book {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public Zip getZip() {  return zip;  }
+
+    public void setZip(Zip zip) { this.zip = zip;
     }
 }
 

@@ -30,8 +30,11 @@ public class User {
     @Size(min=3,message="Password > 3 and verify passwords do not match")
     private String password;
 
-    @NotNull
-    private int zipcode;
+    /**added lines*/
+   
+    @OneToOne
+    @JoinColumn(name="zip_id")
+    private Zip zip;
 
     @OneToMany
     @JoinColumn(name="user_id")
@@ -73,8 +76,8 @@ public class User {
         this.password = password;
     }
 
-    public int getZipcode() { return zipcode; }
+    public Zip getZipcode() { return zip; }
 
-    public void setZipcode(int zipcode) {this.zipcode = zipcode;
+    public void setZipcode(Zip zip) {this.zip = zip;
     }
 }

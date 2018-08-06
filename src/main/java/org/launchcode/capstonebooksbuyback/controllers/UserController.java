@@ -1,7 +1,9 @@
 package org.launchcode.capstonebooksbuyback.controllers;
 import org.launchcode.capstonebooksbuyback.models.Book;
 import org.launchcode.capstonebooksbuyback.models.User;
+import org.launchcode.capstonebooksbuyback.models.Zip;
 import org.launchcode.capstonebooksbuyback.models.data.UserDao;
+import org.launchcode.capstonebooksbuyback.models.data.ZipDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.stereotype.Controller;
@@ -24,6 +26,9 @@ public class UserController {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private ZipDao zipDao;
 /**********Added login**/
 
     @RequestMapping(value="login", method=RequestMethod.GET)
@@ -47,8 +52,9 @@ public class UserController {
                     /*return "redirect:/book/add/" +user.getId();*/
                     return "redirect:/book";
                 }
+
             }
-            return "redirect:user/add";
+            return "redirect:../user/add";
 
     }
 
@@ -66,33 +72,55 @@ public class UserController {
     @RequestMapping(value="add", method=RequestMethod.GET)
     public String displayAddUserForm (Model model){
         model.addAttribute("title","Register User");
+        model.addAttribute("zips",zipDao.findAll());
+
         model.addAttribute(new User());
         return "user/add";
     }
     @RequestMapping(value="add", method=RequestMethod.POST)
-    public String processAddUserForm(@ModelAttribute @Valid User user, Errors error, String verify, Model model,HttpServletRequest request){
+    public String processAddUserForm(@ModelAttribute @Valid User user, Errors error,
+                                     @RequestParam int zipId,
+                                     String verify, Model model,
+                                     HttpServletRequest request){
 
-        if(error.hasErrors()){
-            model.addAttribute("title","Register User");
-            return "user/add";
+        Zip zip = null;
+        System.out.println("zip id "+ zipId);
+        System.out.println("verify "+ verify);
+        System.out.println("password"+ user.getPassword());
+
+        Optional<Zip> zip1 = zipDao.findById(zipId);
+        if(zip1.isPresent()) {
+            zip = zip1.get();
         }
 
+        if(error.hasErrors()){
+            System.out.println("*******************");
+
+            System.out.println("error" +error.getAllErrors());
+
+            model.addAttribute("title","Register User");
+            model.addAttribute("zips",zipDao.findAll());
+            return "user/add";
+        }
         if(verify.equals(user.getPassword())){
+            user.setZipcode(zip);
             userDao.save(user);
             HttpSession session = request.getSession();
             session.setAttribute("username", user.getUsername());
             session.setAttribute("id", user.getId());
-            /*return "redirect:/book/add/" +user.getId();*/
             return "redirect:/book/add";
+
         }
+
         /* if password and verify passwords are not same */
-        else{
+       /* else{
             model.addAttribute("username",user.getUsername());
             model.addAttribute("email", user.getEmail());
+            model.addAttribute("zips",zipDao.findAll());
             model.addAttribute("password","");
             model.addAttribute("verify","");
             return "user/add";
-        }
-
+        }*/
+return "user/add";
     }
 }

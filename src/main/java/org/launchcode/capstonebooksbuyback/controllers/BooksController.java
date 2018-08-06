@@ -1,8 +1,10 @@
 package org.launchcode.capstonebooksbuyback.controllers;
 import org.launchcode.capstonebooksbuyback.models.Book;
 import org.launchcode.capstonebooksbuyback.models.User;
+import org.launchcode.capstonebooksbuyback.models.Zip;
 import org.launchcode.capstonebooksbuyback.models.data.BookDao;
 import org.launchcode.capstonebooksbuyback.models.data.UserDao;
+import org.launchcode.capstonebooksbuyback.models.data.ZipDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 import static java.lang.Integer.parseInt;
@@ -29,6 +32,9 @@ public class BooksController {
 
      @Autowired
      private UserDao userDao;
+
+    @Autowired
+    private ZipDao zipDao;
 
     //add RequestMapping to configure the route to this
     //@ResponseBody allows text to be sent directly from the
@@ -61,7 +67,6 @@ public class BooksController {
         Optional<User> user1 = userDao.findById(userId);
         if(user1.isPresent()){
             User user = user1.get();
-           // int [] zipcodes = {"63017","63141","63005"};
             model.addAttribute(new Book());
             model.addAttribute("userId",user.getId());
             model.addAttribute("title","Welcome"+ user.getUsername() + "\n You can now sell books");
@@ -86,6 +91,7 @@ public class BooksController {
         Optional<User> user1 = userDao.findById(userId);
         if(user1.isPresent()) {
             User user = user1.get();
+            book.setZip(user.getZipcode());
             book.setUser(user);
             bookDao.save(book);
             System.out.println("user id is "+ user.getId());
@@ -150,19 +156,24 @@ public class BooksController {
         return "book/index";
     }
 
-    ///find book by user
-    /**public String booksByUser(Model model, @RequestParam int id){
+    @RequestMapping(value = "zip/{id}", method=RequestMethod.GET)
+    public String findBookByZip (Model model, @PathVariable int zipId){
 
-        Optional<User> user1 = userDao.findById(id);
-        if(user1.isPresent()) {
-            User user = user1.get();
-            List<Book> books = user.;
+        Optional<Zip> zip1 = zipDao.findById(zipId);
+        if(zip1.isPresent()) {
+            Zip zip = zip1.get();
+
+            List<Book> books = zip.getBooks();
             model.addAttribute("books", books);
-            model.addAttribute("title", "books by user" + user.getUsername());
+            model.addAttribute("title", "Books in zip" + zip.getZipNumber());
+            return "book/index";
         }
-        return "user/index";
-
-    }**/
+        else {
+            Iterable<Zip> books =zipDao.findAll();
+            model.addAttribute("books",books);
+            return "book/index";
+        }
+    }
 
 
 
