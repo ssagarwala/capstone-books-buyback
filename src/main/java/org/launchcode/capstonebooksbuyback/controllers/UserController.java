@@ -84,9 +84,6 @@ public class UserController {
                                      HttpServletRequest request){
 
         Zip zip = null;
-        System.out.println("zip id "+ zipId);
-        System.out.println("verify "+ verify);
-        System.out.println("password"+ user.getPassword());
 
         Optional<Zip> zip1 = zipDao.findById(zipId);
         if(zip1.isPresent()) {
@@ -94,9 +91,6 @@ public class UserController {
         }
 
         if(error.hasErrors()){
-            System.out.println("*******************");
-
-            System.out.println("error" +error.getAllErrors());
 
             model.addAttribute("title","Register User");
             model.addAttribute("zips",zipDao.findAll());
@@ -109,18 +103,16 @@ public class UserController {
             session.setAttribute("username", user.getUsername());
             session.setAttribute("id", user.getId());
             return "redirect:/book/add";
-
         }
-
         /* if password and verify passwords are not same */
-       /* else{
+        else{
             model.addAttribute("username",user.getUsername());
             model.addAttribute("email", user.getEmail());
             model.addAttribute("zips",zipDao.findAll());
             model.addAttribute("password","");
             model.addAttribute("verify","");
             return "user/add";
-        }*/
-return "user/add";
+        }
+
     }
 }

@@ -63,14 +63,13 @@ public class BooksController {
         HttpSession session = request.getSession();
 
         Integer userId = (Integer) session.getAttribute("id");
-        System.out.println("Found uer ***********");
+
         Optional<User> user1 = userDao.findById(userId);
         if(user1.isPresent()){
             User user = user1.get();
             model.addAttribute(new Book());
             model.addAttribute("userId",user.getId());
             model.addAttribute("title","Welcome"+ user.getUsername() + "\n You can now sell books");
-            System.out.println("Found uer 2 ***********");
             return "book/add";
         }
         return "redirect:";
@@ -94,7 +93,6 @@ public class BooksController {
             book.setZip(user.getZipcode());
             book.setUser(user);
             bookDao.save(book);
-            System.out.println("user id is "+ user.getId());
             return "redirect:";
         }
        //leaving redirect empty, redirect to the same controller's index method.
@@ -155,26 +153,4 @@ public class BooksController {
         }
         return "book/index";
     }
-
-    @RequestMapping(value = "zip/{id}", method=RequestMethod.GET)
-    public String findBookByZip (Model model, @PathVariable int zipId){
-
-        Optional<Zip> zip1 = zipDao.findById(zipId);
-        if(zip1.isPresent()) {
-            Zip zip = zip1.get();
-
-            List<Book> books = zip.getBooks();
-            model.addAttribute("books", books);
-            model.addAttribute("title", "Books in zip" + zip.getZipNumber());
-            return "book/index";
-        }
-        else {
-            Iterable<Zip> books =zipDao.findAll();
-            model.addAttribute("books",books);
-            return "book/index";
-        }
     }
-
-
-
-}

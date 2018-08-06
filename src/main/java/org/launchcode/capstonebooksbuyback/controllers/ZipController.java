@@ -1,16 +1,17 @@
 package org.launchcode.capstonebooksbuyback.controllers;
 
+import org.launchcode.capstonebooksbuyback.models.Book;
 import org.launchcode.capstonebooksbuyback.models.Zip;
 import org.launchcode.capstonebooksbuyback.models.data.ZipDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("zip")
@@ -25,6 +26,28 @@ public class ZipController {
         model.addAttribute("zips", zipDao.findAll());
         model.addAttribute("title", "zipCodes");
         return "zip/index";
+    }
+
+    @RequestMapping(value = "", method=RequestMethod.POST)
+    public String findBookByZip (Model model, @RequestParam int zipId){
+
+
+        Optional<Zip> zip1 = zipDao.findById(zipId);
+        if(zip1.isPresent()) {
+            Zip zip = zip1.get();
+
+            List<Book> books = zip.getBooks();
+
+            model.addAttribute("books", books);
+            model.addAttribute("zips", zipDao.findAll());
+            model.addAttribute("title", "Books in zip   :" + zip.getZipNumber());
+            return "zip/index";
+        }
+        else {
+            Iterable<Zip> zips =zipDao.findAll();
+            model.addAttribute("zips",zips);
+            return "zip/index";
+        }
     }
 
     @RequestMapping(value = "add", method = RequestMethod.GET)
