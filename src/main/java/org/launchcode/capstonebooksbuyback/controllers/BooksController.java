@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,11 +28,11 @@ import static java.lang.Integer.parseInt;
 @RequestMapping("book")
 public class BooksController {
 
-     @Autowired
-     private BookDao bookDao;
+    @Autowired
+    private BookDao bookDao;
 
-     @Autowired
-     private UserDao userDao;
+    @Autowired
+    private UserDao userDao;
 
     @Autowired
     private ZipDao zipDao;
@@ -41,7 +42,7 @@ public class BooksController {
     // controller method
     //RequestPAth: /book
     @RequestMapping("")
-    public String index(Model model,HttpServletRequest request) {
+    public String index(Model model, HttpServletRequest request) {
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("id");
         Optional<User> user1 = userDao.findById(userId);
@@ -55,71 +56,72 @@ public class BooksController {
         model.addAttribute("title", "Please log in your account ");
         return "user/login";
     }
-   /* @RequestMapping(value="add/{userId}", method=RequestMethod.GET
-   * public String displayAddBookForm (@PathVariable int userId,Model model){*/
-    @RequestMapping(value="add", method=RequestMethod.GET)
-    public String displayAddBookForm (Model model,HttpServletRequest request){
+
+    /* @RequestMapping(value="add/{userId}", method=RequestMethod.GET
+     * public String displayAddBookForm (@PathVariable int userId,Model model){*/
+    @RequestMapping(value = "add", method = RequestMethod.GET)
+    public String displayAddBookForm(Model model, HttpServletRequest request) {
 
         HttpSession session = request.getSession();
 
         Integer userId = (Integer) session.getAttribute("id");
 
         Optional<User> user1 = userDao.findById(userId);
-        if(user1.isPresent()){
+        if (user1.isPresent()) {
             User user = user1.get();
             model.addAttribute(new Book());
-            model.addAttribute("userId",user.getId());
-            model.addAttribute("title","Welcome"+ user.getUsername() + "\n You can now sell books");
+            model.addAttribute("userId", user.getId());
+            model.addAttribute("title", "Welcome" + user.getUsername() + "\n You can now sell books");
             return "book/add";
         }
         return "redirect:";
     }
 
-   /* public String processAddBookForm(@ModelAttribute @Valid Book book,Errors error,@RequestParam int userId, Model model){
-*/
+    /* public String processAddBookForm(@ModelAttribute @Valid Book book,Errors error,@RequestParam int userId, Model model){
+     */
 
-    @RequestMapping(value="add", method=RequestMethod.POST)
-    public String processAddBookForm(@ModelAttribute @Valid Book book, Errors error, HttpServletRequest request, Model model){
-        if(error.hasErrors()){
-            model.addAttribute("title","Add Book");
+    @RequestMapping(value = "add", method = RequestMethod.POST)
+    public String processAddBookForm(@ModelAttribute @Valid Book book, Errors error, HttpServletRequest request, Model model) {
+        if (error.hasErrors()) {
+            model.addAttribute("title", "Add Book");
             return "book/add";
         }
         //Integer userId1= Integer.parseInt(userId);
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("id");
         Optional<User> user1 = userDao.findById(userId);
-        if(user1.isPresent()) {
+        if (user1.isPresent()) {
             User user = user1.get();
             book.setZip(user.getZipcode());
             book.setUser(user);
             bookDao.save(book);
             return "redirect:";
         }
-       //leaving redirect empty, redirect to the same controller's index method.
+        //leaving redirect empty, redirect to the same controller's index method.
         return "redirect:/user/login";
     }
 
-    @RequestMapping(value="remove", method=RequestMethod.GET)
-    public String displayRemoveBookForm(Model model, HttpServletRequest request){
+    @RequestMapping(value = "remove", method = RequestMethod.GET)
+    public String displayRemoveBookForm(Model model, HttpServletRequest request) {
 
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("id");
         Optional<User> user1 = userDao.findById(userId);
-        if(user1.isPresent()) {
+        if (user1.isPresent()) {
             User user = user1.get();
             Iterable<User> books = user.getBooks();
-            model.addAttribute("books",books);
+            model.addAttribute("books", books);
             model.addAttribute("title", "Remove Books");
             return "book/remove";
         }
         return "redirect:/user/login";
     }
 
-    @RequestMapping(value="remove", method=RequestMethod.POST)
-    public String processRemoveBookForm(@RequestParam int[] bookIds){
+    @RequestMapping(value = "remove", method = RequestMethod.POST)
+    public String processRemoveBookForm(@RequestParam int[] bookIds) {
 
         for (int bookId : bookIds) {
-             bookDao.deleteById(bookId);
+            bookDao.deleteById(bookId);
         }
         //leaving redirect empty, redirect to the same controller's index method.
 
@@ -127,24 +129,24 @@ public class BooksController {
     }
 
 
-    @RequestMapping(value="edit/{bookId}", method=RequestMethod.GET)
-    public String displayEditForm(@PathVariable int bookId,Model model){
+    @RequestMapping(value = "edit/{bookId}", method = RequestMethod.GET)
+    public String displayEditForm(@PathVariable int bookId, Model model) {
         //Book book = BookData.getById(bookId);
 
         Optional<Book> book1 = bookDao.findById(bookId);
-        if(book1.isPresent()) {
+        if (book1.isPresent()) {
             Book book = book1.get();
-            model.addAttribute("book", book );
+            model.addAttribute("book", book);
             model.addAttribute("title", "Capstone Book Buyback");
             return "book/edit";
         }
         return "book/index";
     }
 
-    @RequestMapping(value="edit", method=RequestMethod.POST)
-    public String processEditForm(int bookId, String name, String author){
+    @RequestMapping(value = "edit", method = RequestMethod.POST)
+    public String processEditForm(int bookId, String name, String author) {
         Optional<Book> book1 = bookDao.findById(bookId);
-        if(book1.isPresent()) {
+        if (book1.isPresent()) {
             Book book = book1.get();
             book.setName(name);
             book.setAuthor(author);
@@ -153,4 +155,5 @@ public class BooksController {
         }
         return "book/index";
     }
-    }
+
+}
